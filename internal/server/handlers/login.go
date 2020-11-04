@@ -92,6 +92,7 @@ func Validate(c *fiber.Ctx) {
 	// Respond
 	response := fiber.Map{}
 	response["token"] = token
+	response["user"] = user
 	response["expires"] = expTime.UTC()
 	c.JSON(response)
 }
@@ -116,6 +117,7 @@ func Refresh(c *fiber.Ctx) {
 	// Respond
 	response := fiber.Map{}
 	response["token"] = token
+	response["user"] = user
 	response["expires"] = expTime.UTC()
 	c.JSON(response)
 }
