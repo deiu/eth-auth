@@ -66,7 +66,7 @@ if the signature is good, together with the token's expiration time.
 
 Request:
 ```bash
-curl 'http://localhost:3000/login/0x91ff16a5ffb07e2f58600afc6ff9c1c32ded1f81' \
+curl 'http://api.example.org/login/0x91ff16a5ffb07e2f58600afc6ff9c1c32ded1f81' \
   -X POST \
   -H 'Content-Type: application/json' \
   --data-binary '{"signature": "0x5114fb7...33f5c031c"}'
@@ -93,7 +93,7 @@ containing a new expiration date and token:
 
 Request:
 ```bash
-curl 'http://localhost:3000/refresh' \
+curl 'http://api.example.org/refresh' \
   -H 'Authorization: Bearer eyJleHAiOjE....fyHd7kPlg'
 ```
 
