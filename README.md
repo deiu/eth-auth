@@ -1,4 +1,4 @@
-# JWT authorization service using Ethereum / ENS identities
+# JWT service using Ethereum / ENS identities
 
 A goland API that implements a challenge/response mechanism in order to 
 issue JWTs using Ethereum identities. It also (optionally) supports ETH to ENS 
