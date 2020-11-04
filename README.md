@@ -32,16 +32,69 @@ $ go run server.go
 
 ## How to use the API
 
-Basically, the way the API works is that a client will send a request to 
-obtain a challenge from the server that will then be presented to the user 
-in order to be signed with the user's Ethereum key.
+### Obtaining the challenge
+Basically, the way the API works is that a client will send a GET request to 
+`/login/{ethAddress}` in order to obtain a unique challenge from the server 
+that will then be presented to the user in order to be signed with the user's 
+Ethereum key.
 
-Next, the API will validate the user's signature and issue the JWT if the 
+Replace `http://api.example.org` with your own domain.
+
+Request:
+```bash
+curl 'http://api.example.org/login/0x91ff16a5ffb07e2f58600afc6ff9c1c32ded1f81'
+```
+
+Response:
+```js
+{
+  address: "0x91ff16a5ffb07e2f58600afc6ff9c1c32ded1f81",
+  challenge: "To prove your identity, please sign this one-time nonce: JiqPLBbLBdCfWZoS"
+}
+```
+
+### Obtaining the JWT
+
+Next, the client must send a POST request to `/login/{ethAddress}`, containing the signed
+challenge. The API then will validate the user's signature and issue the JWT if the 
 signature is good, together with the token's expiration time.
 
-Clients can obtain a new token as they get closer to the expiration time, 
-by sending a GET request to `/refresh`.
+Request:
+```bash
+curl 'http://localhost:3000/login/0x91ff16a5ffb07e2f58600afc6ff9c1c32ded1f81' \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  --data-binary '{"signature": "0x5114fb7...33f5c031c"}'
+```
 
+Response:
+```js
+{
+  expires: "2020-11-06T15:06:38.602022706Z",
+  token: "eyJleHAiOjE....fyHd7kPlg"
+}
+```
+
+### Refreshing a JWT before expiration
+
+Clients can obtain a new token as they get closer to the expiration time, 
+by sending a GET request to `/refresh` using the (still valid) JWT as a `Bearer`
+token within an `Authorization` header. The response is similar to the one above, 
+containing a new expiration date and token:
+
+Request:
+```bash
+curl 'http://localhost:3000/refresh' \
+  -H 'Authorization: Bearer eyJleHAiOjE....fyHd7kPlg'
+```
+
+Response:
+```js
+{
+  expires: "2020-11-06T15:06:38.602022706Z",
+  token: "eyJleHAiOjE2MD....fY1qv8Oxjw"
+}
+```
 
 If you want to see a full example check out the `test-client` directory 
 for a small client app in JavaScript, which uses Metamask as the Ethereum 
