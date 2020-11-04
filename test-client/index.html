@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ETH authentication</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <div id="not_allowed">
+      <h2>You are not allowed to view this page!</h2>
+      <button id="auth">Authenticate</button>
+    </div>
+    <div id="allowed" hidden>
+      <h2 style="color: green;">You are allowed access</h2>
+      <p>JWT: <span id="user"></span></p>
+    </div>
+    <script src="ethers-5.0.umd.min.js"></script>
+    <script src="client.js"></script>
+  </body>
+</html>
