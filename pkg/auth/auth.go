@@ -13,17 +13,21 @@ var (
 
 // NewJWT creates a new JWT for the specfied user, based on the
 // provided secret
-func NewJWT(user string, secret string) (string, error) {
+func NewJWT(user string, expTime int64, hexKey string) (string, error) {
 	// Create token
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.New(jwt.SigningMethodES256)
 
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
 	claims["name"] = user
-	claims["exp"] = time.Now().Add(JWTExpiration).Unix()
+	claims["exp"] = expTime
 
 	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte(secret))
+	key, err := ParseHexKey(hexKey)
+	if err != nil {
+		return "", err
+	}
+	t, err := token.SignedString(key)
 	if err != nil {
 		return "", err
 	}

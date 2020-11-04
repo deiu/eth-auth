@@ -24,7 +24,11 @@ var (
 
 const (
 	// This should be replaced by EIP 712 in the future
-	challengeText = `To prove your identity, please sign this one-time nonce: `
+	challengeText = "To prove your identity, please sign this one-time nonce: "
+	// ErrChallengeNotFound error message
+	ErrChallengeNotFound = "Could not find a matching challenge for this address."
+	// ErrChallengeBadRequest error message
+	ErrChallengeBadRequest = "No address or signature provided when attempting to prove the challenge."
 )
 
 func init() {
@@ -54,14 +58,13 @@ func NewChallenge(address string) (string, error) {
 // address of the user who signed the message.
 func VerifyChallenge(address string, signature string) (string, error) {
 	if len(address) == 0 || len(signature) == 0 {
-		return "", errors.New("No address or signature provided when attempting to prove the challenge")
+		return "", errors.New(ErrChallengeBadRequest)
 	}
 
 	// Fetch pending challenge from db
 	data, found := db.Get(utils.EncodeString(address))
 	if found == false {
-		return "", errors.New("Could not find a matching challenge for address: " +
-			address)
+		return "", errors.New(ErrChallengeNotFound)
 	}
 	defer db.Delete(utils.EncodeString(address))
 	challenge := data.(*Challenge)

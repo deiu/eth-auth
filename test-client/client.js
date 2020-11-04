@@ -9,6 +9,9 @@ const init = () => {
     document.getElementById('auth').addEventListener('click', async () => {
       await auth()
     }, true)
+    document.getElementById('refresh').addEventListener('click', async () => {
+      await refresh()
+    }, true)
 }
 
 const auth = async () => {
@@ -16,10 +19,14 @@ const auth = async () => {
     method: 'GET'
   })
   let res = await fetch(req)
-  let data = await res.text()
+  let data = await res.json()
   console.log(data)
+  let sig = ""
 
-  const sig = await sign(data)
+  // make sure we're signing from the right account
+  if (web3.eth.defaultAccount === data.address) {
+    sig = await sign(data.challenge)
+  }
 
   req = new Request(`http://localhost:3000/login/${web3.eth.defaultAccount}`, {
     method: 'POST',
@@ -32,8 +39,26 @@ const auth = async () => {
   data = await res.json();
   if (res.status === 200) {
     allow(data.token)
-  } else if (res.status === 403 || !data.isMember) {
-    deny(data.user)
+  } else if (res.status === 403) {
+    deny(data)
+  } else {
+    throw new Error('Something went wrong on api server!');
+  }
+}
+
+const refresh = async () => {
+  req = new Request(`http://localhost:3000/refresh`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${document.getElementById('token').innerText}`
+    }
+  })
+  res = await fetch(req)
+  data = await res.json();
+  if (res.status === 200) {
+    allow(data.token)
+  } else if (res.status === 403) {
+    deny(data)
   } else {
     throw new Error('Something went wrong on api server!');
   }
@@ -47,7 +72,7 @@ const sign = (msg) => {
 const allow = (token) => {
   document.getElementById('not_allowed').hidden = true
   document.getElementById('allowed').hidden = false
-  document.getElementById('user').innerText = token
+  document.getElementById('token').innerText = token
 }
 
 const deny = (name) => {

@@ -18,8 +18,8 @@ func main() {
 	if os.Getenv("ORIGINS") != "" {
 		conf.Origins = strings.Fields(os.Getenv("ORIGINS"))
 	}
-	if os.Getenv("JWT_SECRET") != "" {
-		conf.JWTSecret = os.Getenv("JWT_SECRET")
+	if os.Getenv("ETH_PRIVKEY") != "" {
+		conf.JWTSecret = os.Getenv("ETH_PRIVKEY")
 	}
 	if os.Getenv("LOGGING") != "" {
 		conf.Logging = true

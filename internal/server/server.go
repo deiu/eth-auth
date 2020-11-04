@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/deiu/eth-auth/internal/server/handlers"
+	"github.com/deiu/eth-auth/pkg/auth"
 	"github.com/deiu/eth-auth/pkg/resolver"
 	"github.com/gofiber/cors"
 	"github.com/gofiber/fiber"
@@ -52,11 +53,17 @@ func Listen(port int, conf Config) (*fiber.App, error) {
 
 	// JWT Middleware
 	if len(conf.JWTSecret) == 0 {
-		return nil, errors.New("You must provide an encryption passphrase for JWT")
+		return nil, errors.New("You must provide the Eth private key for signing JWTs")
+	}
+	privKey, err := auth.ParseHexKey(conf.JWTSecret)
+	if err != nil {
+		return nil, err
 	}
 	jtwConf := jwtware.Config{
-		SigningKey: []byte(conf.JWTSecret),
+		SigningMethod: "ES256",
+		SigningKey:    &privKey.PublicKey,
 	}
+	handlers.EthSignKey = conf.JWTSecret
 
 	// Init Infura
 	if len(conf.InfuraURL) > 0 && len(conf.InfuraKey) > 0 {
@@ -74,7 +81,7 @@ func Listen(port int, conf Config) (*fiber.App, error) {
 	app.Post("/login/:addr", handlers.Validate)
 
 	// Refresh a token
-	app.Post("/refresh", jwtware.New(jtwConf), handlers.Refresh)
+	app.Get("/refresh", jwtware.New(jtwConf), handlers.Refresh)
 
 	app.Listen(port)
 	return app, nil
