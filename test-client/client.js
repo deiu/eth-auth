@@ -1,9 +1,8 @@
 ethereum.autoRefreshOnNetworkChange = false
 
+// setup Web3 provider
 const network = 'rinkeby'
 const provider = new ethers.getDefaultProvider(network, {etherscan: '5TC41U8EV1GMIQKE3VV7CX1FJT1NE1BF6V'})
-
-let acl = ['sambra.eth', 'akasha.eth']
 
 const init = () => {
     document.getElementById('auth').addEventListener('click', async () => {
@@ -15,12 +14,12 @@ const init = () => {
 }
 
 const auth = async () => {
+  // get challenge from API while using the current account from Metamask
   let req = new Request(`http://localhost:3000/login/${web3.eth.defaultAccount}`, {
     method: 'GET'
   })
   let res = await fetch(req)
   let data = await res.json()
-  console.log(data)
   let sig = ""
 
   // make sure we're signing from the right account
@@ -28,6 +27,7 @@ const auth = async () => {
     sig = await sign(data.challenge)
   }
 
+  // reply with signed response
   req = new Request(`http://localhost:3000/login/${web3.eth.defaultAccount}`, {
     method: 'POST',
     headers: {
@@ -38,14 +38,17 @@ const auth = async () => {
   res = await fetch(req)
   data = await res.json();
   if (res.status === 200) {
+    /// all good, think about storing the authz token
     allow(data.token)
   } else if (res.status === 403) {
+    // forbidden
     deny(data)
   } else {
     throw new Error('Something went wrong on api server!');
   }
 }
 
+// refresh token
 const refresh = async () => {
   req = new Request(`http://localhost:3000/refresh`, {
     method: 'GET',
@@ -64,17 +67,20 @@ const refresh = async () => {
   }
 }
 
+// sign message with Metamask
 const sign = (msg) => {
   const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner()
   return signer.signMessage(msg)
 }
 
+// update DOM when allowing access
 const allow = (token) => {
   document.getElementById('not_allowed').hidden = true
   document.getElementById('allowed').hidden = false
   document.getElementById('token').innerText = token
 }
 
+// update DOM when denying access
 const deny = (name) => {
   // name = (!name) ? '<em>Unregistered ENS name</em>' : name
   document.getElementById('allowed').hidden = true
