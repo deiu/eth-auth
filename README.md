@@ -15,7 +15,7 @@ $ go get github.com/deiu/eth-auth
 The server needs the following ENV variables to be set before running:
 * `INFURA_API_URL` - [optional] the Infura API URL for ENS resolution
 * `INFURA_API_KEY` - [optional] the Infura API key for ENS resolution
-* `ORIGINS` - list of allowed Origins separated by space (your client app URL)
+* `ORIGINS` - list of allowed Origins separated by space (i.e. your client app URL)
 * `ETH_PRIVKEY` - a private Ethereum key that is used to sign the JWTs (in hexa)
 * `LOGGING` - whether to log requests to stdout
 
@@ -61,7 +61,7 @@ Response:
 ### Obtaining the JWT
 
 Next, the client must send a `POST` request to `/login/{ethAddress}`, containing the
-signed challenge. The API then will validate the user's signature and issue the JWT
+signed challenge. The API will then validate the user's signature and issue the JWT
 if the signature is good, together with the token's expiration time.
 
 Request:
@@ -77,7 +77,7 @@ Response:
 {
   expires: "2020-11-06T15:06:38.602022706Z",
   token: "eyJleHAiOjE....fyHd7kPlg",
-  user: "0x350F72a69D....67C2EBE98dA"
+  user: "0x91ff16a5ffb07e2f58600afc6ff9c1c32ded1f81"
 }
 ```
 
@@ -102,7 +102,7 @@ Response:
 {
   expires: "2020-11-06T15:06:38.602022706Z",
   token: "eyJleHAiOjE2MD....fY1qv8Oxjw",
-  user: "0x350F72a69D....67C2EBE98dA"
+  user: "0x91ff16a5ffb07e2f58600afc6ff9c1c32ded1f81"
 }
 ```
 
